@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070d">
+<meta name="color-scheme" content="dark">
+<title>LUCKY 777 — виртуальный клуб</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ffd166'/%3E%3Cpath d='M50 50H13L40 11' fill='none' stroke='%231a1206' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ───────────── SVG SPRITE ───────────── -->
+<svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe9ad"/><stop offset=".55" stop-color="#ffc247"/><stop offset="1" stop-color="#ff9f1c"/>
+    </linearGradient>
+    <linearGradient id="g-cherry" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a8a"/><stop offset="1" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="g-lemon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fef9c3"/><stop offset="1" stop-color="#facc15"/>
+    </linearGradient>
+    <linearGradient id="g-violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ddd6fe"/><stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="g-cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cffafe"/><stop offset="1" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="g-red" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fda4af"/><stop offset="1" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="g-platinum" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/><stop offset="1" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+
+  <symbol id="i-coin" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="url(#g-gold)"/>
+    <circle cx="12" cy="12" r="7.4" fill="none" stroke="#9a5500" stroke-opacity=".45" stroke-width="1.1"/>
+    <path d="M12 7.4l1.35 3 3.25.3-2.45 2.15.72 3.15L12 14.55l-2.87 1.55.72-3.15L7.4 10.7l3.25-.3z" fill="#8a4b00"/>
+  </symbol>
+
+  <symbol id="i-logo" viewBox="0 0 24 24">
+    <path d="M19 19H5L15 4" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-spark" viewBox="0 0 24 24">
+    <path d="M12 2l2.3 7.7L22 12l-7.7 2.3L12 22l-2.3-7.7L2 12l7.7-2.3z" fill="url(#g-gold)"/>
+  </symbol>
+
+  <symbol id="i-grid" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="8" height="8" rx="2.4" fill="currentColor"/>
+    <rect x="13" y="3" width="8" height="8" rx="2.4" fill="currentColor" opacity=".55"/>
+    <rect x="3" y="13" width="8" height="8" rx="2.4" fill="currentColor" opacity=".55"/>
+    <rect x="13" y="13" width="8" height="8" rx="2.4" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="i-gift" viewBox="0 0 24 24">
+    <path d="M3 9h18v3H3z" fill="currentColor"/>
+    <path d="M5 12h14v8.2c0 .5-.4.8-.9.8H5.9c-.5 0-.9-.3-.9-.8z" fill="currentColor" opacity=".7"/>
+    <path d="M11 9V6.4C11 4.5 9.7 3 8 3S5 4.2 5 5.8C5 7.6 6.6 9 9 9zM13 9h3.4C18.8 9 20 7.6 20 5.8 20 4.2 18.7 3 17 3s-3 1.5-3 3.4z" fill="currentColor"/>
+    <rect x="10.6" y="7" width="2.8" height="14" rx="1.2" fill="#0b0a12" opacity=".45"/>
+  </symbol>
+
+  <symbol id="i-user" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4.2" fill="currentColor"/>
+    <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7z" fill="currentColor" opacity=".75"/>
+  </symbol>
+
+  <symbol id="i-back" viewBox="0 0 24 24">
+    <path d="M14.8 5.4a1.4 1.4 0 010 2L9.2 13l5.6 5.6a1.4 1.4 0 01-2 2l-6.6-6.6a1.4 1.4 0 010-2l6.6-6.6a1.4 1.4 0 012 0z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="i-info" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="12" cy="7.6" r="1.25" fill="currentColor"/>
+    <path d="M12 10.6v6.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-close" viewBox="0 0 24 24">
+    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-sound" viewBox="0 0 24 24">
+    <path d="M4 9.5h3.4L12 5.5v13L7.4 14.5H4z" fill="currentColor"/>
+    <path d="M15.5 8.6a4.8 4.8 0 010 6.8M18 6a8.2 8.2 0 010 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-cards" viewBox="0 0 24 24">
+    <rect x="3.2" y="6.6" width="11.6" height="15" rx="2.2" fill="currentColor" opacity=".45" transform="rotate(-9 9 14)"/>
+    <rect x="9" y="2.8" width="11.6" height="15" rx="2.2" fill="currentColor" transform="rotate(7 14.8 10.3)"/>
+    <text x="15.3" y="13.6" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="7.4" font-weight="900" fill="#0b0a12" transform="rotate(7 15.3 13.6)">21</text>
+  </symbol>
+
+  <symbol id="i-wheel" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="12" cy="12" r="2.2" fill="currentColor"/>
+    <path d="M12 3v6M12 15v6M3 12h6M15 12h6" stroke="currentColor" stroke-width="1.4" opacity=".6"/>
+    <path d="M5.6 5.6l4.2 4.2M14.2 14.2l4.2 4.2M18.4 5.6l-4.2 4.2M9.8 14.2l-4.2 4.2" stroke="currentColor" stroke-width="1.4" opacity=".6"/>
+  </symbol>
+
+  <symbol id="i-crash" viewBox="0 0 24 24">
+    <path d="M4 20V4" stroke="currentColor" stroke-width="1.6" opacity=".4"/>
+    <path d="M4 20h16" stroke="currentColor" stroke-width="1.6" opacity=".4"/>
+    <path d="M5 17c3.2-.4 5-2.6 6.2-5.4C12.4 8.4 14.2 6 19 5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M15 4.2L19.6 4.6l-1 4.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-dice" viewBox="0 0 24 24">
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4.2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="8.4" cy="8.4" r="1.45" fill="currentColor"/>
+    <circle cx="15.6" cy="8.4" r="1.45" fill="currentColor"/>
+    <circle cx="12" cy="12" r="1.45" fill="currentColor"/>
+    <circle cx="8.4" cy="15.6" r="1.45" fill="currentColor"/>
+    <circle cx="15.6" cy="15.6" r="1.45" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="i-clock" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M12 7v5.4l3.4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  </symbol>
+
+  <symbol id="i-check" viewBox="0 0 24 24">
+    <path d="M4.5 12.5l5 5 10-11" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-lock" viewBox="0 0 24 24">
+    <rect x="4.5" y="10" width="15" height="10.5" rx="2.6" fill="currentColor" opacity=".8"/>
+    <path d="M8 10V7.8a4 4 0 018 0V10" stroke="currentColor" stroke-width="1.9" fill="none"/>
+  </symbol>
+
+  <symbol id="i-trash" viewBox="0 0 24 24">
+    <path d="M4 7h16M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7M6.5 7l.8 12.2c.1 1 .9 1.8 1.9 1.8h5.6c1 0 1.8-.8 1.9-1.8L17.5 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-share" viewBox="0 0 24 24">
+    <circle cx="18" cy="5.5" r="2.6" fill="currentColor"/>
+    <circle cx="6" cy="12" r="2.6" fill="currentColor"/>
+    <circle cx="18" cy="18.5" r="2.6" fill="currentColor"/>
+    <path d="M8.3 10.8l7.4-3.9M8.3 13.2l7.4 3.9" stroke="currentColor" stroke-width="1.7"/>
+  </symbol>
+
+  <!-- ── slot symbols ── -->
+  <symbol id="s-cherry" viewBox="0 0 48 48">
+    <path d="M23 19c0-7 4.4-11.2 9.6-13.2" stroke="#4ade80" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M24 19c1-5 0-9.2-4.2-12.2" stroke="#22c55e" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <circle cx="15.5" cy="30" r="8.4" fill="#b91c1c"/>
+    <circle cx="15.5" cy="30" r="8.4" fill="url(#g-cherry)"/>
+    <ellipse cx="12.6" cy="26.8" rx="2.7" ry="1.9" fill="#fff" opacity=".55" transform="rotate(-28 12.6 26.8)"/>
+    <circle cx="31.8" cy="33" r="7.1" fill="#991b1b"/>
+    <circle cx="31.8" cy="33" r="7.1" fill="url(#g-cherry)"/>
+    <ellipse cx="29.6" cy="30.4" rx="2.2" ry="1.5" fill="#fff" opacity=".45" transform="rotate(-28 29.6 30.4)"/>
+  </symbol>
+
+  <symbol id="s-lemon" viewBox="0 0 48 48">
+    <ellipse cx="24" cy="26" rx="14.2" ry="9.6" fill="url(#g-lemon)" transform="rotate(-18 24 26)"/>
+    <path d="M34.6 14.6l5-3.1" stroke="#65a30d" stroke-width="2.4" stroke-linecap="round"/>
+    <ellipse cx="19" cy="22.4" rx="4.6" ry="2.3" fill="#fff" opacity=".45" transform="rotate(-18 19 22.4)"/>
+  </symbol>
+
+  <symbol id="s-bell" viewBox="0 0 48 48">
+    <path d="M24 7.5c-1.4 0-2.4 1-2.4 2.4v1.7C15.3 13 11.4 19 11.4 26.6v4.9l-2.6 3.5h30.4l-2.6-3.5v-4.9C36.6 19 32.7 13 26.4 11.6V9.9c0-1.4-1-2.4-2.4-2.4Z" fill="url(#g-gold)"/>
+    <rect x="20.4" y="35.4" width="7.2" height="2.4" rx="1.2" fill="#b45309"/>
+    <circle cx="24" cy="40" r="2.7" fill="#f59e0b"/>
+    <path d="M18 18.5c1.6-2.4 3.9-3.8 6-4.2" stroke="#fff" stroke-width="2" opacity=".5" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="s-star" viewBox="0 0 48 48">
+    <path d="M24 4.5l5.6 12.1 13.1 1.7-9.6 9.1 2.5 13-11.6-6.3-11.6 6.3 2.5-13-9.6-9.1 13.1-1.7z" fill="url(#g-violet)" stroke="#c4b5fd" stroke-width="1"/>
+    <path d="M24 12l3 6.6 7.2.9-5.3 5 1.4 7.1L24 28l-6.3 3.6 1.4-7.1-5.3-5 7.2-.9z" fill="#fff" opacity=".18"/>
+  </symbol>
+
+  <symbol id="s-diamond" viewBox="0 0 48 48">
+    <path d="M14.5 10h19L42 20 24 40 6 20z" fill="url(#g-cyan)"/>
+    <path d="M14.5 10l4.3 10h10.4L33.5 10M6 20h36M24 40L18.8 20M24 40L29.2 20" stroke="#fff" stroke-opacity=".45" stroke-width="1.2" fill="none"/>
+  </symbol>
+
+  <symbol id="s-seven" viewBox="0 0 48 48">
+    <path d="M13 11h22" stroke="#ef4444" stroke-width="2.4" opacity=".35" stroke-linecap="round"/>
+    <text x="24" y="39" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="35" font-weight="900" fill="url(#g-red)" stroke="#7f1d1d" stroke-width=".7" paint-order="stroke">7</text>
+  </symbol>
+</svg>
+
+<div class="app" id="app">
+
+  <!-- ───────────── TOP BAR ───────────── -->
+  <header class="topbar">
+    <a class="brand" href="#/home" aria-label="LUCKY 777">
+      <span class="brand-mark"><svg><use href="#i-logo"/></svg></span>
+      <span class="brand-name">LUCKY 777<em>club</em></span>
+    </a>
+    <div class="balance" id="balancePill" title="Ваши очки">
+      <svg class="coin"><use href="#i-coin"/></svg>
+      <span class="balance-value" data-balance>10 000</span>
+      <button class="balance-add" id="balanceAdd" aria-label="Получить очки">+</button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ───────────── HOME ───────────── -->
+    <section class="screen is-active" data-screen="home">
+      <div class="greeting">
+        <p id="greetLine">Добро пожаловать в клуб</p>
+        <h2 id="greetName">Игрок</h2>
+      </div>
+
+      <div class="bonus-hero" id="bonusHero">
+        <div class="hero-shine"></div>
+        <div class="hero-top">
+          <span class="hero-tag"><svg><use href="#i-gift"/></svg> Бонус дня</span>
+          <span class="hero-timer" id="heroTimer">готов</span>
+        </div>
+        <div class="hero-main">
+          <div>
+            <div class="hero-amount">до <span>8 000</span></div>
+            <div class="hero-sub">Колесо фортуны · раз в 4 часа</div>
+          </div>
+          <button class="hero-btn" id="heroClaim">Крутить</button>
+        </div>
+      </div>
+
+      <div class="daily-card" data-daily>
+        <div class="daily-head">
+          <span class="hero-tag"><svg><use href="#i-gift"/></svg> Ежедневный вход</span>
+          <span class="daily-timer" data-daily-timer>до 00:00</span>
+        </div>
+        <div class="daily-main">
+          <div>
+            <div class="daily-amount" data-daily-amount>+1 000</div>
+            <div class="daily-sub" data-daily-sub>день 1</div>
+          </div>
+          <button class="daily-btn" data-daily-claim>Забрать</button>
+        </div>
+        <div class="daily-dots" data-daily-dots></div>
+      </div>
+
+      <div class="section-head"><h3>Игры</h3><span class="muted">честная математика</span></div>
+      <div class="games-grid">
+        <button class="game-card gc-slots" data-open="slots">
+          <div class="gc-art">
+            <svg class="gc-sym s1"><use href="#s-cherry"/></svg>
+            <svg class="gc-sym s2"><use href="#s-seven"/></svg>
+            <svg class="gc-sym s3"><use href="#s-diamond"/></svg>
+          </div>
+          <div class="gc-info"><b>Слоты</b><span>5 линий · до ×3500</span></div>
+        </button>
+        <button class="game-card gc-roulette" data-open="roulette">
+          <div class="gc-art">
+            <svg class="gc-big"><use href="#i-wheel"/></svg>
+          </div>
+          <div class="gc-info"><b>Рулетка</b><span>европейская · 37</span></div>
+        </button>
+        <button class="game-card gc-crash" data-open="crash">
+          <div class="gc-art">
+            <svg class="gc-big"><use href="#i-crash"/></svg>
+            <span class="gc-chip">x24.7</span>
+          </div>
+          <div class="gc-info"><b>Краш</b><span>забери до взрыва</span></div>
+        </button>
+        <button class="game-card gc-dice" data-open="dice">
+          <div class="gc-art">
+            <svg class="gc-big"><use href="#i-dice"/></svg>
+          </div>
+          <div class="gc-info"><b>Кости</b><span>больше / меньше</span></div>
+        </button>
+        <button class="game-card wide gc-blackjack" data-open="blackjack">
+          <div class="gc-art">
+            <span class="bj-mini a">A<span>♠</span></span>
+            <span class="bj-mini b">K<span>♥</span></span>
+          </div>
+          <span class="gc-edge">3:2</span>
+          <div class="gc-info"><b>Блэкджек</b><span>21 · дилер до 17</span></div>
+        </button>
+      </div>
+
+      <div class="section-head"><h3>Твоя игра</h3><a class="link" href="#/profile">Статистика</a></div>
+      <div class="mini-stats" id="homeStats"></div>
+
+      <div class="section-head"><h3>Последние раунды</h3></div>
+      <div class="recent" id="recentList"></div>
+    </section>
+
+    <!-- ───────────── BONUS ───────────── -->
+    <section class="screen" data-screen="bonus">
+      <div class="screen-head simple">
+        <div class="screen-title"><h1>Бонусы</h1><p>Колесо фортуны · раз в 4 часа</p></div>
+        <span class="pill" id="streakPill">серия 0</span>
+      </div>
+
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <div class="wheel" id="wheel">
+          <svg id="wheelSvg" viewBox="0 0 300 300"></svg>
+          <div class="wheel-hub"><svg><use href="#i-logo"/></svg></div>
+        </div>
+      </div>
+
+      <div class="wheel-status" id="wheelStatus">Колесо готово к запуску</div>
+      <button class="btn primary" id="bonusSpinBtn">Крутить колесо</button>
+
+      <div class="daily-card" data-daily>
+        <div class="daily-head">
+          <span class="hero-tag"><svg><use href="#i-gift"/></svg> Ежедневный вход</span>
+          <span class="daily-timer" data-daily-timer>до 00:00</span>
+        </div>
+        <div class="daily-main">
+          <div>
+            <div class="daily-amount" data-daily-amount>+1 000</div>
+            <div class="daily-sub" data-daily-sub>день 1</div>
+          </div>
+          <button class="daily-btn" data-daily-claim>Забрать</button>
+        </div>
+        <div class="daily-dots" data-daily-dots></div>
+      </div>
+
+      <div class="streak-row" id="streakRow"></div>
+      <div class="card note">
+        <b>Как это работает</b>
+        <p>Один бесплатный прокрут раз в 4 часа. Чем дольше серия ежедневных заходов — тем больше множитель к призу (до +50%). Очки — виртуальные, вывести их нельзя.</p>
+      </div>
+    </section>
+
+    <!-- ───────────── PROFILE ───────────── -->
+    <section class="screen" data-screen="profile">
+      <div class="profile-head">
+        <div class="avatar" id="profileAvatar">И</div>
+        <h1 id="profileName">Игрок</h1>
+        <p class="muted" id="profileMeta">виртуальный клуб</p>
+      </div>
+
+      <div class="wallet-card">
+        <span class="wallet-label">Баланс клуба</span>
+        <div class="wallet-value"><svg class="coin"><use href="#i-coin"/></svg><span data-balance>10 000</span></div>
+        <div class="wallet-actions">
+          <button class="btn small primary" id="walletBonus">К бонусам</button>
+          <button class="btn small ghost" id="walletShare">Поделиться</button>
+        </div>
+      </div>
+
+      <div class="referral-card" data-referral>
+        <div class="ref-top">
+          <span class="hero-tag"><svg><use href="#i-gift"/></svg> Пригласи друга</span>
+          <span class="pill" data-ref-count>0 друзей</span>
+        </div>
+        <div class="ref-main">
+          <div>
+            <div class="ref-amount" data-ref-amount>+1 000</div>
+            <div class="ref-sub" data-ref-sub>тебе · друг получит +2 000</div>
+          </div>
+          <button class="btn small primary" data-ref-invite>Пригласить</button>
+        </div>
+        <div class="ref-referred" data-ref-referred hidden>
+          <span>Ты пришёл по ссылке друга</span>
+          <button class="ref-send" data-ref-send>Отправить бонус</button>
+        </div>
+        <div class="ref-foot">
+          <button class="ref-copy" data-ref-copy>Скопировать ссылку</button>
+          <span data-ref-earned>Заработано: 0</span>
+        </div>
+        <div class="ref-note" data-ref-note hidden></div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="section-head"><h3>Достижения</h3><span class="muted" id="achCount">0 / 6</span></div>
+      <div class="achievements" id="achievements"></div>
+
+      <div class="section-head"><h3>Настройки</h3></div>
+      <div class="settings card">
+        <div class="setting">
+          <div class="setting-icon"><svg><use href="#i-sound"/></svg></div>
+          <div class="setting-text"><b>Звук</b><span>клики, спины, выигрыши</span></div>
+          <button class="switch is-on" data-toggle="sound" aria-label="Звук"><i></i></button>
+        </div>
+        <div class="setting">
+          <div class="setting-icon"><svg><use href="#i-spark"/></svg></div>
+          <div class="setting-text"><b>Вибрация</b><span>haptic-отклик в Telegram</span></div>
+          <button class="switch is-on" data-toggle="haptics" aria-label="Вибрация"><i></i></button>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <b>18+</b>
+        <p>LUCKY 777 — развлекательное приложение. Все ставки и выигрыши — виртуальные очки, они не являются деньгами, не покупаются и не выводятся. Математика игр настроена так же, как в реальных казино, но денег здесь нет.</p>
+      </div>
+
+      <button class="btn ghost danger" id="resetBtn"><svg><use href="#i-trash"/></svg> Сбросить прогресс</button>
+      <p class="version">LUCKY 777 v1.0 · сделано на вайбе</p>
+    </section>
+
+    <!-- ───────────── SLOTS ───────────── -->
+    <section class="screen game" data-screen="slots">
+      <div class="screen-head">
+        <button class="icon-btn" data-back aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <div class="screen-title"><h1>Слоты</h1><p>5 барабанов · 5 линий</p></div>
+        <button class="icon-btn" data-info="slots" aria-label="Правила игры"><svg><use href="#i-info"/></svg></button>
+      </div>
+
+      <div class="slot-shell">
+        <div class="slot-grid" id="slotGrid"></div>
+        <div class="slot-win" id="slotWin"></div>
+      </div>
+
+      <div class="slot-paytable">
+        <div class="paytable-head"><span></span><span>3</span><span>4</span><span>5</span></div>
+        <div class="paytable-row"><svg><use href="#s-cherry"/></svg><span>×8</span><span>×22</span><span>×55</span></div>
+        <div class="paytable-row"><svg><use href="#s-lemon"/></svg><span>×11</span><span>×28</span><span>×70</span></div>
+        <div class="paytable-row"><svg><use href="#s-bell"/></svg><span>×16</span><span>×44</span><span>×115</span></div>
+        <div class="paytable-row"><svg><use href="#s-star"/></svg><span>×28</span><span>×70</span><span>×210</span></div>
+        <div class="paytable-row"><svg><use href="#s-diamond"/></svg><span>×50</span><span>×140</span><span>×420</span></div>
+        <div class="paytable-row"><svg><use href="#s-seven"/></svg><span>×200</span><span>×700</span><span>×3500</span></div>
+      </div>
+
+      <div class="game-foot">
+        <div class="bet-control" id="slotBet"></div>
+        <button class="btn primary action" id="slotSpinBtn">
+          <span>Крутить</span><b id="slotBetLabel">100</b>
+        </button>
+      </div>
+    </section>
+
+    <!-- ───────────── ROULETTE ───────────── -->
+    <section class="screen game" data-screen="roulette">
+      <div class="screen-head">
+        <button class="icon-btn" data-back aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <div class="screen-title"><h1>Рулетка</h1><p>европейская · одно зеро</p></div>
+        <button class="icon-btn" data-info="roulette" aria-label="Правила игры"><svg><use href="#i-info"/></svg></button>
+      </div>
+
+      <div class="ribbon">
+        <div class="ribbon-strip" id="rouletteStrip"></div>
+        <div class="ribbon-fade"></div>
+        <div class="ribbon-marker"></div>
+      </div>
+
+      <div class="roulette-table" id="rouletteTable"></div>
+      <div class="roulette-history" id="rouletteHistory"></div>
+      <div class="roulette-bets" id="rouletteBets"></div>
+
+      <div class="game-foot">
+        <div class="roulette-bar">
+          <div class="chips" id="rouletteChips"></div>
+          <div class="roulette-total">Ставка <b id="rouletteTotal">0</b></div>
+        </div>
+        <div class="row-buttons">
+          <button class="btn ghost compact" id="rouletteUndo">Отменить</button>
+          <button class="btn ghost compact" id="rouletteClear">Сброс</button>
+        </div>
+        <button class="btn primary" id="rouletteSpinBtn">Крутить</button>
+      </div>
+    </section>
+
+    <!-- ───────────── CRASH ───────────── -->
+    <section class="screen game" data-screen="crash">
+      <div class="screen-head">
+        <button class="icon-btn" data-back aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <div class="screen-title"><h1>Краш</h1><p>забери до взрыва</p></div>
+        <button class="icon-btn" data-info="crash" aria-label="Правила игры"><svg><use href="#i-info"/></svg></button>
+      </div>
+
+      <div class="crash-stage">
+        <canvas id="crashCanvas"></canvas>
+        <div class="crash-overlay">
+          <div class="crash-mult" id="crashMult">1.00<span>×</span></div>
+          <div class="crash-status" id="crashStatus">Сделайте ставку</div>
+        </div>
+      </div>
+
+      <div class="crash-history" id="crashHistory"></div>
+
+      <div class="game-foot">
+        <div class="auto-row">
+          <span class="auto-label">Авто-кэшаут</span>
+          <div class="auto-presets" id="crashPresets"></div>
+        </div>
+
+        <div class="bet-control" id="crashBet"></div>
+        <button class="btn primary action" id="crashAction"><span>Играть</span><b id="crashBetLabel">100</b></button>
+      </div>
+    </section>
+
+    <!-- ───────────── DICE ───────────── -->
+    <section class="screen game" data-screen="dice">
+      <div class="screen-head">
+        <button class="icon-btn" data-back aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <div class="screen-title"><h1>Кости</h1><p>dice 1–100</p></div>
+        <button class="icon-btn" data-info="dice" aria-label="Правила игры"><svg><use href="#i-info"/></svg></button>
+      </div>
+
+      <div class="dice-stage">
+        <div class="dice-big" id="diceNumber">50</div>
+        <div class="dice-bar">
+          <div class="dice-zone is-under" id="diceZone"></div>
+          <div class="dice-result" id="diceResultMark"></div>
+          <div class="dice-target" id="diceMarker"></div>
+        </div>
+        <div class="dice-labels"><span>1</span><span>50</span><span>100</span></div>
+      </div>
+
+      <div class="segmented" id="diceMode">
+        <button class="is-active" data-over="true">Больше <span id="diceModeOver">&gt; 50</span></button>
+        <button data-over="false">Меньше <span id="diceModeUnder">&lt; 50</span></button>
+      </div>
+
+      <div class="dice-slider-row">
+        <span class="dice-slider-label">Цель</span>
+        <input type="range" id="diceTarget" min="4" max="97" step="1" value="50">
+        <span class="dice-slider-value" id="diceTargetVal">50</span>
+      </div>
+
+      <div class="dice-meta">
+        <div><span>Шанс</span><b id="diceChance">50%</b></div>
+        <div><span>Выплата</span><b id="dicePayout" class="gold">×1.94</b></div>
+      </div>
+
+      <div class="game-foot">
+        <div class="bet-control" id="diceBet"></div>
+        <button class="btn primary action" id="diceRollBtn"><span>Бросить</span><b id="diceBetLabel">100</b></button>
+      </div>
+    </section>
+
+    <!-- ───────────── BLACKJACK ───────────── -->
+    <section class="screen game" data-screen="blackjack">
+      <div class="screen-head">
+        <button class="icon-btn" data-back aria-label="Назад"><svg><use href="#i-back"/></svg></button>
+        <div class="screen-title"><h1>Блэкджек</h1><p>21 · дилер до 17 · блэкджек 3:2</p></div>
+        <button class="icon-btn" data-info="blackjack" aria-label="Правила игры"><svg><use href="#i-info"/></svg></button>
+      </div>
+
+      <div class="bj-table">
+        <div class="bj-side">
+          <div class="bj-label"><span>Дилер</span><b id="bjDealerScore">—</b></div>
+          <div class="bj-hand" id="bjDealerHand"></div>
+        </div>
+        <div class="bj-mid" id="bjStatus">Сделайте ставку</div>
+        <div class="bj-side">
+          <div class="bj-label"><span>Вы</span><b id="bjPlayerScore">—</b></div>
+          <div class="bj-hand" id="bjPlayerHand"></div>
+        </div>
+        <div class="bj-watermark">BLACKJACK<span>PAYS 3:2</span></div>
+        <div class="bj-banner" id="bjBanner"></div>
+      </div>
+
+      <div class="game-foot">
+        <div class="bj-three" id="bjThree" hidden>
+          <button class="btn ghost compact" data-bj="hit">Ещё</button>
+          <button class="btn ghost compact" data-bj="double">Удвоить</button>
+          <button class="btn primary compact" data-bj="stand">Хватит</button>
+        </div>
+
+        <div class="bet-control" id="bjBet"></div>
+        <button class="btn primary action" id="bjDeal"><span>Раздать</span><b id="bjBetLabel">100</b></button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ───────────── TAB BAR ───────────── -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab is-active" data-tab="home"><svg><use href="#i-grid"/></svg><span>Казино</span></button>
+    <button class="tab" data-tab="bonus"><svg><use href="#i-gift"/></svg><span>Бонус</span></button>
+    <button class="tab" data-tab="profile"><svg><use href="#i-user"/></svg><span>Профиль</span></button>
+  </nav>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div id="sheetRoot"></div>
+<div id="confettiRoot" class="confetti-root"></div>
+
+<script src="js/config.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
