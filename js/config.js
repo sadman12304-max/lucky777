@@ -2,7 +2,7 @@
 // Пока botUsername пустой — реферальные ссылки ведут на сайт (в браузер),
 // а не в Telegram. После создания бота впиши username без @ и short name.
 window.LUCKY_CONFIG = {
-  botUsername: '',            // например: 'lucky777_points_bot'
+  botUsername: 'lucky777luckybot',            // например: 'lucky777_points_bot'
   appShortName: 'lucky777',   // short name мини-аппы из BotFather
   referral: {
     inviteeBonus: 2000,       // сколько получает приглашённый
