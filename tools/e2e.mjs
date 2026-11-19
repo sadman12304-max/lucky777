@@ -62,12 +62,13 @@ try {
   check('roulette: лента заполнена', (await js(`document.querySelectorAll('#rouletteStrip .ribbon-cell').length`)) === 56);
   await js(`document.querySelector('[data-outside="red"]').click()`);
   check('roulette: ставка поставлена', (await js(`document.getElementById('rouletteTotal').textContent`)) !== '0');
-  const rouletteBefore = await balance();
+  await js(`document.querySelector('[data-dozen="2"]').click()`);
+  check('roulette: дюжина 13–24 ставится', (await js(`document.getElementById('rouletteTotal').textContent.replace(/[^0-9]/g, '')`)) === '200');
+  const rouletteStakedBefore = await js(`LUCKY.store.state.stats.staked`);
   await js(`document.getElementById('rouletteSpinBtn').click()`);
   await sleep(4400);
-  const rouletteAfter = await balance();
   check('roulette: раунд записан', (await rounds()) === 2);
-  check('roulette: баланс изменился', rouletteAfter !== rouletteBefore, `${rouletteBefore} → ${rouletteAfter}`);
+  check('roulette: ставка 200 списана', (await js(`LUCKY.store.state.stats.staked`)) === rouletteStakedBefore + 200);
   check('roulette: лента остановилась на результате', (await js(`document.querySelectorAll('#rouletteStrip .is-result').length`)) === 1);
 
   /* ── кости ── */
@@ -178,6 +179,19 @@ try {
   const presetsRight = await js(`(() => { const r = document.getElementById('crashPresets').getBoundingClientRect(); return Math.round(r.right); })()`);
   check('320px: нет горизонтального переполнения в краше', scroll320 <= 321, 'scrollWidth=' + scroll320);
   check('320px: авто-кэшаут целиком в экране', presetsRight <= 320, 'right=' + presetsRight);
+
+  await go('#/keno');
+  const kenoWidth = await js(`Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)`);
+  check('320px: кено без горизонтального переполнения', kenoWidth <= 321, 'scrollWidth=' + kenoWidth);
+  check('320px: кнопка кено доступна', await js(`(() => {
+    const b = document.getElementById('kenoPlay').getBoundingClientRect();
+    return b.top < 700 && b.bottom <= 701;
+  })()`));
+
+  await go('#/roulette');
+  const rouletteWidth = await js(`Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)`);
+  const outsideRight = await js(`Math.round(document.getElementById('rouletteOutside').getBoundingClientRect().right)`);
+  check('320px: ставки рулетки в экране', rouletteWidth <= 321 && outsideRight <= 320, `w=${rouletteWidth}, right=${outsideRight}`);
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
 
   await go('#/home');
@@ -197,6 +211,18 @@ try {
   const winsBefore = await js(`LUCKY.store.state.stats.wins`);
   await js(`LUCKY.store.recordRound({ game: 'blackjack', bet: 100, win: 100 })`);
   check('пуш не засчитывается как победа', (await js(`LUCKY.store.state.stats.wins`)) === winsBefore);
+
+  const kenoRoundsBefore = await rounds();
+  await go('#/keno');
+  check('keno: 80 чисел на поле', (await js(`document.querySelectorAll('#kenoBoard .keno-cell').length`)) === 80);
+  await js(`document.getElementById('kenoRandom').click()`);
+  check('keno: выбрано 10 чисел', (await js(`document.querySelectorAll('#kenoBoard .is-picked').length`)) === 10);
+  const kenoBalanceBefore = await balance();
+  await js(`document.getElementById('kenoPlay').click()`);
+  await sleep(2300);
+  check('keno: раунд записан', (await rounds()) === kenoRoundsBefore + 1);
+  check('keno: результат показан', (await js(`document.getElementById('kenoResult').textContent`)).includes('Поймано'));
+  check('keno: баланс изменился', (await balance()) !== kenoBalanceBefore);
 
   /* ── консоль ── */
   const realErrors = errors.filter((e) => !/CloudStorage|favicon|postEvent|Telegram\.WebView/i.test(e));

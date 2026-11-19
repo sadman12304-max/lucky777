@@ -14,6 +14,7 @@ import { setupRoulette } from './games/roulette.js';
 import { setupCrash } from './games/crash.js';
 import { setupDice } from './games/dice.js';
 import { setupBlackjack } from './games/blackjack.js';
+import { setupKeno } from './games/keno.js';
 
 import { setupHome } from './screens/home.js';
 import { setupBonus } from './screens/bonus.js';
@@ -21,13 +22,13 @@ import { setupProfile } from './screens/profile.js';
 import { setupDaily } from './screens/daily.js';
 import { setupReferral } from './screens/referral.js';
 
-const SCREENS = ['home', 'bonus', 'profile', 'slots', 'roulette', 'crash', 'dice', 'blackjack'];
+const SCREENS = ['home', 'bonus', 'profile', 'slots', 'roulette', 'crash', 'dice', 'blackjack', 'keno'];
 
 // Отладочные ручки (LUCKY 777._state и т.п.) — только локально, не в проде.
 const DEBUG =
   ['localhost', '127.0.0.1'].includes(location.hostname) ||
   new URLSearchParams(location.search).has('debug');
-const GAME_SCREENS = new Set(['slots', 'roulette', 'crash', 'dice', 'blackjack']);
+const GAME_SCREENS = new Set(['slots', 'roulette', 'crash', 'dice', 'blackjack', 'keno']);
 
 let current = null;
 let games = {};
@@ -111,6 +112,7 @@ function boot() {
     crash: setupCrash(ctx),
     dice: setupDice(ctx),
     blackjack: setupBlackjack(ctx),
+    keno: setupKeno(ctx),
   };
 
   home = setupHome(ctx);

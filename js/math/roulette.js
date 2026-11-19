@@ -32,6 +32,7 @@ export const OUTSIDE_BETS = {
 
 export function betMultiplier(bet) {
   if (bet.kind === 'straight') return 36;
+  if (bet.kind === 'dozen') return 3;
   const def = OUTSIDE_BETS[bet.kind];
   return def ? def.mult : 0;
 }
@@ -40,6 +41,10 @@ export function betWins(bet, result) {
   switch (bet.kind) {
     case 'straight':
       return bet.number === result;
+    case 'dozen': {
+      const start = (bet.number - 1) * 12 + 1;
+      return result >= start && result <= start + 11;
+    }
     case 'red':
       return isRed(result) && result !== 0;
     case 'black':

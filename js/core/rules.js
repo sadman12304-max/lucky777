@@ -25,6 +25,7 @@ export const RULES = {
         <div class="rule-row"><span>Красное / чёрное</span><b>×2</b></div>
         <div class="rule-row"><span>Чётное / нечётное</span><b>×2</b></div>
         <div class="rule-row"><span>1–18 / 19–36</span><b>×2</b></div>
+        <div class="rule-row"><span>Дюжина: 1–12 · 13–24 · 25–36</span><b>×3</b></div>
       </div>
       <p style="margin-top:12px">Множитель включает возврат ставки. Нулевое зеро выигрывает только при ставке на 0. Преимущество заведения — 2,7%.</p>
     `,
@@ -53,6 +54,22 @@ export const RULES = {
         <div class="rule-row"><span>Удвоение</span><b>+1 карта, ставка ×2</b></div>
       </div>
       <p style="margin-top:12px">Туз считается за 11 или 1 — автоматически, как выгоднее. Колода — 6 колод, тасуется, когда остаётся меньше 24 карт. При базовой стратегии преимущество заведения — около 1–2%.</p>
+    `,
+  },
+  keno: {
+    title: 'Кено · правила',
+    body: `
+      <p>Выбери 10 чисел из 80. Выпадает 20 — чем больше совпадений, тем больше выплата. Выигрыш начинается с 4 попаданий.</p>
+      <div class="rules-list">
+        <div class="rule-row"><span>4 попадания</span><b>×2.5</b></div>
+        <div class="rule-row"><span>5</span><b>×5</b></div>
+        <div class="rule-row"><span>6</span><b>×16</b></div>
+        <div class="rule-row"><span>7</span><b>×60</b></div>
+        <div class="rule-row"><span>8</span><b>×300</b></div>
+        <div class="rule-row"><span>9</span><b>×1500</b></div>
+        <div class="rule-row"><span>10</span><b>×5000</b></div>
+      </div>
+      <p style="margin-top:12px">Множители — к ставке. Числа выпадают криптографическим генератором. Возврат игроку — около 96%.</p>
     `,
   },
   dice: {

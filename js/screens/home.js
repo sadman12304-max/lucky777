@@ -11,6 +11,7 @@ const GAMES = {
   blackjack: { name: 'Блэкджек', icon: 'i-cards' },
   crash: { name: 'Краш', icon: 'i-crash' },
   dice: { name: 'Кости', icon: 'i-dice' },
+  keno: { name: 'Кено', icon: 'i-keno' },
 };
 
 export function setupHome(ctx) {

@@ -4,6 +4,7 @@ import { simulate as simSlots, LINES } from '../js/math/slots.js';
 import { resolveBets, spin as spinRoulette, colorOf } from '../js/math/roulette.js';
 import { simulate as simCrash } from '../js/math/crash.js';
 import { simulate as simDice, roll } from '../js/math/dice.js';
+import { simulate as simKeno } from '../js/math/keno.js';
 
 const SPINS = Number(process.argv[2] || 300000);
 
@@ -28,6 +29,7 @@ const bets = [
   { kind: 'odd', amount: 1 },
   { kind: 'low', amount: 1 },
   { kind: 'high', amount: 1 },
+  { kind: 'dozen', number: 1, amount: 1 },
 ];
 console.log('\nРУЛЕТКА (37 чисел, 7 видов ставок):');
 for (const bet of bets) {
@@ -39,7 +41,7 @@ for (const bet of bets) {
     staked += bet.amount;
     returned += resolveBets([bet], result);
   }
-  const label = bet.kind === 'straight' ? `straight ${bet.number}` : bet.kind;
+  const label = bet.kind === 'straight' ? `straight ${bet.number}` : bet.kind === 'dozen' ? `dozen ${bet.number}` : bet.kind;
   console.log(`  ${label.padEnd(12)} ${pct(returned / staked)}`);
 }
 
@@ -47,6 +49,12 @@ console.log('\nКРАШ:');
 for (const target of [1.2, 1.5, 2, 3, 5, 10]) {
   console.log(`  кэшаут ×${target.toString().padEnd(4)} EV ${pct(simCrash(target, Math.min(SPINS, 200000)))}`);
 }
+
+console.log('\nКЕНО (10 из 80, 20 выпадает):');
+const keno = simKeno(Math.min(SPINS, 150000));
+console.log(`  RTP          ${pct(keno.rtp)}`);
+console.log(`  hit rate     ${pct(keno.hitRate)}`);
+console.log(`  лучший хит   ${keno.bestHits} из 10`);
 
 console.log('\nКОСТИ:');
 for (const [target, over] of [[50, true], [50, false], [75, true], [25, false], [90, true]]) {

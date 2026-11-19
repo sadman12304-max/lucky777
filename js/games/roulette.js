@@ -6,18 +6,24 @@ import { fmt, sleep, icon } from '../core/util.js';
 
 const COLOR_LABEL = { red: 'красное', black: 'чёрное', green: 'зеро' };
 const OUTSIDE = [
-  { kind: 'low', label: '1–18' },
-  { kind: 'even', label: 'ЧЁТНОЕ' },
   { kind: 'red', label: 'КРАСНОЕ', cls: 'red' },
+  { kind: 'even', label: 'ЧЁТНОЕ' },
+  { kind: 'low', label: '1–18' },
   { kind: 'black', label: 'ЧЁРНОЕ', cls: 'black' },
   { kind: 'odd', label: 'НЕЧЁТНОЕ' },
   { kind: 'high', label: '19–36' },
+];
+const DOZENS = [
+  { number: 1, label: '1–12' },
+  { number: 2, label: '13–24' },
+  { number: 3, label: '25–36' },
 ];
 const CHIPS = [10, 50, 100, 500];
 
 export function setupRoulette(ctx) {
   const { store, sfx, haptic, toast, confetti } = ctx;
   const table = document.getElementById('rouletteTable');
+  const outsideEl = document.getElementById('rouletteOutside');
   const strip = document.getElementById('rouletteStrip');
   const ribbon = strip.parentElement;
   const chipsRoot = document.getElementById('rouletteChips');
@@ -34,6 +40,11 @@ export function setupRoulette(ctx) {
   let chip = 100;
   let locked = false;
 
+  function betKey(kind, number) {
+    if (kind === 'straight') return `straight:${number}`;
+    if (kind === 'dozen') return `dozen:${number}`;
+    return kind;
+  }
   /* ── стол ── */
   const parts = [];
   parts.push(`<button class="rt-cell green zero" data-straight="0" aria-label="Зеро">0</button>`);
@@ -44,10 +55,16 @@ export function setupRoulette(ctx) {
       parts.push(`<button class="rt-cell ${cls}" data-straight="${n}" aria-label="${n}">${n}</button>`);
     }
   }
-  OUTSIDE.forEach((bet) => {
-    parts.push(`<button class="rt-outside ${bet.cls || ''}" data-outside="${bet.kind}">${bet.label}<b hidden>0</b></button>`);
-  });
   table.innerHTML = parts.join('');
+
+  const outsideParts = [];
+  OUTSIDE.forEach((bet) => {
+    outsideParts.push(`<button class="rt-outside ${bet.cls || ''}" data-outside="${bet.kind}">${bet.label}<b hidden>0</b></button>`);
+  });
+  DOZENS.forEach((d) => {
+    outsideParts.push(`<button class="rt-outside" data-dozen="${d.number}">${d.label}<b hidden>0</b></button>`);
+  });
+  outsideEl.innerHTML = outsideParts.join('');
 
   chipsRoot.innerHTML = CHIPS.map(
     (c) => `<button class="chip${c === chip ? ' is-active' : ''}" data-chip="${c}">${fmt(c)}</button>`
@@ -76,7 +93,11 @@ export function setupRoulette(ctx) {
     }
     betsEl.innerHTML = [...bets.values()]
       .map((b) => {
-        const label = b.kind === 'straight' ? String(b.number) : OUTSIDE_LABEL[b.kind];
+        const label = b.kind === 'straight'
+          ? String(b.number)
+          : b.kind === 'dozen'
+            ? `${(b.number - 1) * 12 + 1}–${b.number * 12}`
+            : OUTSIDE_LABEL[b.kind];
         return `<span class="bet-pill">${label}<b>${fmt(b.amount)}</b></span>`;
       })
       .join('');
@@ -90,8 +111,18 @@ export function setupRoulette(ctx) {
       const key = `straight:${cell.dataset.straight}`;
       cell.classList.toggle('has-bet', bets.has(key));
     });
-    table.querySelectorAll('[data-outside]').forEach((cell) => {
+    outsideEl.querySelectorAll('[data-outside]').forEach((cell) => {
       const key = cell.dataset.outside;
+      const bet = bets.get(key);
+      cell.classList.toggle('has-bet', Boolean(bet));
+      const badge = cell.querySelector('b');
+      if (badge) {
+        badge.hidden = !bet;
+        if (bet) badge.textContent = fmt(bet.amount);
+      }
+    });
+    outsideEl.querySelectorAll('[data-dozen]').forEach((cell) => {
+      const key = `dozen:${cell.dataset.dozen}`;
       const bet = bets.get(key);
       cell.classList.toggle('has-bet', Boolean(bet));
       const badge = cell.querySelector('b');
@@ -104,7 +135,7 @@ export function setupRoulette(ctx) {
 
   function addBet(kind, number) {
     if (locked) return;
-    const key = number != null ? `straight:${number}` : kind;
+    const key = betKey(kind, number);
     const existing = bets.get(key);
     const amount = (existing?.amount || 0) + chip;
     if (totalBet() + chip > store.get().balance) {
@@ -121,8 +152,13 @@ export function setupRoulette(ctx) {
 
   table.addEventListener('click', (e) => {
     const num = e.target.closest('[data-straight]');
-    if (num) {
-      addBet('straight', Number(num.dataset.straight));
+    if (num) addBet('straight', Number(num.dataset.straight));
+  });
+
+  outsideEl.addEventListener('click', (e) => {
+    const dz = e.target.closest('[data-dozen]');
+    if (dz) {
+      addBet('dozen', Number(dz.dataset.dozen));
       return;
     }
     const out = e.target.closest('[data-outside]');
@@ -225,19 +261,22 @@ export function setupRoulette(ctx) {
     const resolved = [...bets.values()];
     const payout = resolveBets(resolved, result);
 
-    table.querySelectorAll('.win').forEach((c) => c.classList.remove('win'));
+    outsideEl.querySelectorAll('.win').forEach((c) => c.classList.remove('win'));
     table.querySelector(`[data-straight="${result}"]`)?.classList.add('win');
     resolved.forEach((bet) => {
       const won = bet.kind === 'straight'
         ? bet.number === result
-        : (bet.kind === 'red' && isRed(result))
-          || (bet.kind === 'black' && result !== 0 && !isRed(result))
-          || (bet.kind === 'even' && result !== 0 && result % 2 === 0)
-          || (bet.kind === 'odd' && result % 2 === 1)
-          || (bet.kind === 'low' && result >= 1 && result <= 18)
-          || (bet.kind === 'high' && result >= 19 && result <= 36);
+        : bet.kind === 'dozen'
+          ? result >= (bet.number - 1) * 12 + 1 && result <= bet.number * 12
+          : (bet.kind === 'red' && isRed(result))
+            || (bet.kind === 'black' && result !== 0 && !isRed(result))
+            || (bet.kind === 'even' && result !== 0 && result % 2 === 0)
+            || (bet.kind === 'odd' && result % 2 === 1)
+            || (bet.kind === 'low' && result >= 1 && result <= 18)
+            || (bet.kind === 'high' && result >= 19 && result <= 36);
       if (won && bet.kind !== 'straight') {
-        table.querySelector(`[data-outside="${bet.kind}"]`)?.classList.add('win');
+        if (bet.kind === 'dozen') outsideEl.querySelector(`[data-dozen="${bet.number}"]`)?.classList.add('win');
+        else outsideEl.querySelector(`[data-outside="${bet.kind}"]`)?.classList.add('win');
       }
     });
 
