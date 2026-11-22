@@ -8,6 +8,7 @@ import { createBetControl } from './core/bet.js';
 import { sfx } from './core/sound.js';
 import { openRules } from './core/rules.js';
 import { initReferral, shareClaim, REFERRAL } from './core/referral.js';
+import { backend } from './core/backend.js';
 
 import { setupSlots } from './games/slots.js';
 import { setupRoulette } from './games/roulette.js';
@@ -147,6 +148,19 @@ function boot() {
   window.addEventListener('hashchange', () => apply(parseHash()));
 
   apply(parseHash());
+
+  // Supabase: общий прогресс между устройствами (если настроен).
+  if (backend.enabled) {
+    store.addEventListener('change', () => backend.scheduleSync());
+    backend.restore().then((updated) => {
+      if (updated) {
+        renderBalances();
+        home?.render?.();
+        bonus?.render?.();
+        profile?.render?.();
+      }
+    });
+  }
 
   // Облако Telegram: подтягиваем более свежий прогресс
   if (cloud) {

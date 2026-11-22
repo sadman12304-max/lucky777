@@ -4,6 +4,8 @@
 window.LUCKY_CONFIG = {
   botUsername: 'lucky777luckybot', // username бота без @
   appShortName: 'lucky777',   // short name мини-аппы из BotFather
+  supabaseUrl: '',            // https://xxxx.supabase.co после создания проекта
+  supabaseAnonKey: '',        // anon public key (не service_role!)
   referral: {
     inviteeBonus: 2000,       // сколько получает приглашённый
     inviterBonus: 1000,       // сколько получает пригласивший

@@ -23,11 +23,12 @@
    Их положим в секреты Supabase отдельно.
 5. Разрешить деплой Edge Function (через Supabase CLI или Dashboard). Если CLI — понадобится `supabase login` под твоим аккаунтом.
 
-После этого я напишу:
-- Edge Function `telegram` — вебхук бота (`/me`, `/top`, приветствие при добавлении);
-- Edge Function `api` — синхронизация мини-аппы с проверкой подписи `initData`;
-- клиентскую синхронизацию в `js/core/` и настройки в `js/config.js`;
-- команды установки вебхука и секретов.
+Уже лежат в проекте:
+- `supabase/functions/telegram/index.ts` — вебхук (`/me`, `/top`, приветствие);
+- клиентская синхронизация `js/core/backend.js` + `supabaseUrl`/`supabaseAnonKey` в `js/config.js`;
+- схема и инструкция `supabase/README.md`.
+
+Осталось: создать проект, выполнить SQL, задеплоить функцию и указать URL/anon key.
 
 ## План таблиц
 
@@ -35,7 +36,7 @@
 - `chat_players` — в каких чатах игрок зарегистрирован (для `/top`).
 - `chat_settings` — название чата и служебные настройки.
 
-Схема уже лежит в `backend/schema.sql`.
+Схема уже лежит в `backend/schema.sql`, инструкция по деплою бота — в `supabase/README.md`.
 
 ## Команды бота
 

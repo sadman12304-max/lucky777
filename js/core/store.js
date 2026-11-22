@@ -227,6 +227,26 @@ class Store extends EventTarget {
     this.emit('round');
   }
 
+  /** Применяет серверный прогресс (Supabase) без потери локальных бонусов. */
+  applyRemote(player) {
+    if (!player) return;
+    const s = this.state;
+    const n = (v, fallback = 0) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
+    s.balance = Math.max(0, n(player.balance, s.balance));
+    s.level = {
+      ...s.level,
+      lvl: Math.max(1, Math.trunc(n(player.level, s.level.lvl))),
+      xp: Math.max(0, Math.trunc(n(player.xp, s.level.xp))),
+      totalXp: Math.max(0, Math.trunc(n(player.total_xp, s.level.totalXp))),
+      resets: Math.max(0, Math.trunc(n(player.resets, s.level.resets))),
+    };
+    if (player.stats && typeof player.stats === 'object') {
+      s.stats = { ...s.stats, ...player.stats };
+    }
+    s.updatedAt = Date.parse(player.updated_at) || Date.now();
+    this.touch();
+  }
+
   setSetting(key, value) {
     this.state.settings[key] = value;
     this.touch();
