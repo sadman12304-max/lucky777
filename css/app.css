@@ -1381,3 +1381,55 @@ body.is-sheet { overflow: hidden; }
   gap: 3px; margin-top: 3px;
 }
 .roulette-outside .rt-outside { grid-column: auto; }
+
+/* ───────────── уровни ───────────── */
+.level-card {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px; padding: 12px 14px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 160% at 0% 0%, rgba(255, 209, 102, 0.1), transparent 60%),
+    linear-gradient(145deg, #1a1527, #100d19);
+  border: 1px solid rgba(255, 209, 102, 0.22);
+  box-shadow: var(--shadow);
+}
+.level-card--profile { margin-bottom: 2px; }
+.level-badge {
+  flex: 0 0 52px; width: 52px; height: 52px; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, #ffe08a, #ff9f1c);
+  color: #2a1a00;
+  box-shadow: 0 8px 20px -8px rgba(255, 159, 28, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.level-badge span { font-size: 7px; font-weight: 900; letter-spacing: 0.14em; opacity: 0.65; }
+.level-badge b { font-size: 21px; font-weight: 900; line-height: 1; }
+.level-body { flex: 1; min-width: 0; }
+.level-line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.level-line b { font-size: 13px; font-weight: 800; }
+.level-line span { font-size: 9.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.level-bar { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); margin: 6px 0 4px; overflow: hidden; }
+.level-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ffd166, #ff9f1c); transition: width 0.4s cubic-bezier(0.2, 1, 0.3, 1); }
+.level-hint { font-size: 9px; color: rgba(143, 138, 168, 0.75); }
+
+/* SUPER-скаттер и суперигра */
+.slot-cell.super {
+  background: linear-gradient(180deg, #3a2a12, #1f1608);
+  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.95), 0 0 28px rgba(255, 176, 32, 0.65);
+  z-index: 3;
+}
+.slots-super-note {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px; padding: 8px 10px;
+  border-radius: 11px;
+  background: rgba(255, 209, 102, 0.07);
+  border: 1px dashed rgba(255, 209, 102, 0.3);
+  font-size: 9.5px; line-height: 1.4; color: #ffe3a3;
+}
+.slots-super-note svg { width: 14px; height: 14px; flex: 0 0 14px; }
+
+/* чуть компактнее таблица выплат, чтобы кнопка слотов помещалась */
+.paytable-row { padding: 4px 0; }
+.slot-paytable { margin-top: 8px; padding-top: 7px; }
+@media (max-height: 720px) {
+  .slots-super-note { display: none; }
+}

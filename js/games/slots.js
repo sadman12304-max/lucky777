@@ -1,6 +1,6 @@
 // Экран слотов: анимация барабанов и подсветка линий.
 
-import { SYMBOLS, spinGrid, evaluate, REELS, ROWS } from '../math/slots.js';
+import { SYMBOLS, spinGrid, evaluate, drawSuperPrize, REELS, ROWS, SCATTER } from '../math/slots.js';
 import { randomInt } from '../math/rng.js';
 import { fmt, sleep, icon } from '../core/util.js';
 
@@ -11,6 +11,7 @@ const ICONS = {
   star: 's-star',
   diamond: 's-diamond',
   seven: 's-seven',
+  super: 's-super',
 };
 
 export function setupSlots(ctx) {
@@ -55,7 +56,7 @@ export function setupSlots(ctx) {
   }
 
   function clearHighlights() {
-    cells.flat().forEach((c) => c.classList.remove('hit', 'dim', 'landed'));
+    cells.flat().forEach((c) => c.classList.remove('hit', 'dim', 'landed', 'super'));
   }
 
   function showBanner(text, bad = false) {
@@ -90,6 +91,29 @@ export function setupSlots(ctx) {
     sfx.tick();
   }
 
+  function runSuperGame() {
+    return new Promise((resolve) => {
+      const options = [drawSuperPrize(), drawSuperPrize(), drawSuperPrize()];
+      let settled = false;
+      const done = (mult) => {
+        if (settled) return;
+        settled = true;
+        resolve(mult);
+      };
+      ctx.openSheet({
+        title: 'SUPER GAME',
+        body: '<p>Три бонуса. Выбери один — множитель к ставке.</p><p style="color:#ffd166">Возможные призы: ×2 · ×3 · ×5 · ×8 · ×15 · ×77</p>',
+        closable: false,
+        actions: options.map((mult, i) => ({
+          label: `Открыть ${i + 1}`,
+          kind: i === 0 ? 'primary' : 'ghost',
+          onClick: () => done(mult),
+        })),
+        onClose: () => done(options[0]),
+      });
+    });
+  }
+
   async function spin() {
     if (spinning) return;
     const bet = betCtl.get();
@@ -114,24 +138,41 @@ export function setupSlots(ctx) {
 
     const result = evaluate(grid, bet);
 
-    if (result.total > 0) {
-      const hitCells = new Set();
-      result.wins.forEach((w) => w.cells.forEach(([reel, row]) => hitCells.add(`${reel}:${row}`)));
-      cells.forEach((column, reel) => column.forEach((cell, row) => {
-        if (hitCells.has(`${reel}:${row}`)) cell.classList.add('hit');
-        else cell.classList.add('dim');
-      }));
+    const hitCells = new Set();
+    result.wins.forEach((w) => w.cells.forEach(([reel, row]) => hitCells.add(`${reel}:${row}`)));
+    cells.forEach((column, reel) => column.forEach((cell, row) => {
+      if (hitCells.has(`${reel}:${row}`)) cell.classList.add('hit');
+      else if (result.total > 0) cell.classList.add('dim');
+    }));
+    grid.forEach((column, reel) => column.forEach((sym, row) => {
+      if (sym.id === SCATTER.id) cells[reel][row].classList.add('super');
+    }));
 
-      store.payout(result.total, bet);
-      store.recordRound({ game: 'slots', bet, win: result.total });
+    let superMult = 0;
+    let superWin = 0;
+    if (result.bonus) {
+      superMult = await runSuperGame();
+      superWin = Math.round(bet * superMult);
+      toast(`SUPER GAME: ×${superMult} · +${fmt(superWin)}`, 'win', 3600);
+      confetti(60);
+    }
 
-      const mult = result.total / bet;
-      showBanner(`+${fmt(result.total)}  ·  ${mult >= 10 ? '×' + mult.toFixed(1) : 'выигрыш'}`);
+    const totalWin = result.total + superWin;
+    const mult = totalWin / bet;
+
+    if (totalWin > 0) {
+      store.payout(totalWin, bet);
+      store.recordRound({ game: 'slots', bet, win: totalWin });
+
+      const label = superWin
+        ? `SUPER ×${superMult} · +${fmt(totalWin)}`
+        : `+${fmt(totalWin)}  ·  ${mult >= 10 ? '×' + mult.toFixed(1) : 'выигрыш'}`;
+      showBanner(label);
 
       const rect = board.getBoundingClientRect();
-      floatWin(`+${fmt(result.total)}`, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      floatWin(`+${fmt(totalWin)}`, rect.left + rect.width / 2, rect.top + rect.height / 2);
 
-      if (mult >= 8) {
+      if (superWin || mult >= 8) {
         sfx.bigWin();
         haptic('success');
         confetti(60, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 3 });
@@ -154,7 +195,7 @@ export function setupSlots(ctx) {
   // стартовое поле
   cells.forEach((column) => column.forEach((cell) => setSymbol(cell, randomSymbol())));
 
-  return {
+  const api = {
     enter() {
       betLabel.textContent = fmt(betCtl.get());
       this.resize?.();
@@ -166,4 +207,6 @@ export function setupSlots(ctx) {
     _spin: spin,
     _bet: betCtl,
   };
+  if (ctx.debug) api._superTest = () => runSuperGame();
+  return api;
 }

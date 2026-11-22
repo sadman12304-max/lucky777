@@ -2,6 +2,8 @@
 // Юнит-проверки нового функционала: дюжины рулетки и математика кено.
 import { betWins, resolveBets } from '../js/math/roulette.js';
 import { randomPicks, drawNumbers, evaluate, PAYOUTS, PICK_COUNT, DRAW_COUNT } from '../js/math/keno.js';
+import { quotaFor, levelName, levelProgress } from '../js/core/levels.js';
+import { evaluate as evaluateSlots, SCATTER, drawSuperPrize, BONUS_CHANCE } from '../js/math/slots.js';
 
 let pass = 0;
 let fail = 0;
@@ -47,6 +49,21 @@ for (let k = 4; k <= 10; k++) {
   rtp += p * (PAYOUTS[k] || 0);
 }
 check('кено: теоретический RTP ~95.6%', Math.abs(rtp - 0.956) < 0.005, rtp.toFixed(4));
+
+// ── уровни ──
+check('уровни: квота 1 уровня 1 000', quotaFor(1) === 1000);
+check('уровни: квота растёт на 1 000', quotaFor(4) === 4000);
+check('уровни: названия', levelName(1) === 'Новичок' && levelName(5) === 'Хайроллер');
+const lp = levelProgress({ level: { lvl: 2, xp: 500, totalXp: 2500, resets: 1 } });
+check('уровни: прогресс 500/2000', lp.quota === 2000 && lp.left === 1500 && Math.round(lp.pct) === 25 && lp.resets === 1);
+
+// ── суперигра ──
+const grid = Array.from({ length: 5 }, () => Array.from({ length: 3 }, () => ({ id: 'cherry', pays: [0, 0, 0, 1, 2, 3] })));
+grid[0][0] = SCATTER; grid[1][1] = SCATTER; grid[2][2] = SCATTER;
+const superRes = evaluateSlots(grid, 100);
+check('SUPER: 3 скаттера запускают бонус', superRes.bonus === true && superRes.scatters === 3);
+check('SUPER: шанс в разумных пределах', BONUS_CHANCE > 0 && BONUS_CHANCE < 0.01, String(BONUS_CHANCE));
+check('SUPER: приз из таблицы', [2, 3, 5, 8, 15, 77].includes(drawSuperPrize()));
 
 console.log(`\n=== ${pass}/${pass + fail} PASS ===`);
 if (fail) process.exitCode = 1;

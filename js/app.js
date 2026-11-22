@@ -19,6 +19,7 @@ import { setupKeno } from './games/keno.js';
 import { setupHome } from './screens/home.js';
 import { setupBonus } from './screens/bonus.js';
 import { setupProfile } from './screens/profile.js';
+import { setupLevel } from './screens/level.js';
 import { setupDaily } from './screens/daily.js';
 import { setupReferral } from './screens/referral.js';
 
@@ -118,6 +119,7 @@ function boot() {
   home = setupHome(ctx);
   bonus = setupBonus(ctx);
   profile = setupProfile(ctx);
+  setupLevel(ctx);
   setupDaily(ctx);
   setupReferral(ctx);
 

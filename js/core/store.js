@@ -1,4 +1,6 @@
-// Состояние игрока: баланс, статистика, бонусы, настройки.
+// Состояние игрока: баланс, уровни, статистика, бонусы, настройки.
+
+import { quotaFor } from './levels.js';
 // Хранение: localStorage + (если есть) Telegram CloudStorage.
 
 const KEY = 'lucky777.state.v1';
@@ -24,6 +26,7 @@ function defaults() {
     },
     bonus: { lastSpin: 0, streak: 0 },
     daily: { last: '', streak: 0 },
+    level: { lvl: 1, xp: 0, totalXp: 0, resets: 0 },
     referral: { referredBy: null, joinedAt: 0, claims: [], earned: 0 },
     settings: { sound: true, haptics: true },
     recent: [],
@@ -39,6 +42,14 @@ function normalize(raw) {
     stats: { ...base.stats, ...(raw.stats || {}) },
     bonus: { ...base.bonus, ...(raw.bonus || {}) },
     daily: { ...base.daily, ...(raw.daily || {}) },
+    level: (() => {
+      const l = { ...base.level, ...(raw.level || {}) };
+      l.lvl = Math.max(1, Number(l.lvl) || 1);
+      l.xp = Math.max(0, Number(l.xp) || 0);
+      l.totalXp = Math.max(0, Number(l.totalXp) || 0);
+      l.resets = Math.max(0, Number(l.resets) || 0);
+      return l;
+    })(),
     referral: (() => {
       const r = { ...base.referral, ...(raw.referral || {}) };
       r.claims = Array.isArray(r.claims) ? r.claims.slice(0, 100) : [];
@@ -150,7 +161,19 @@ class Store extends EventTarget {
     s.balance -= amount;
     s.stats.staked += amount;
     s.stats.maxBet = Math.max(s.stats.maxBet, amount);
+
+    // Уровни: XP = оборот, квота растёт на 1000 за уровень.
+    s.level.totalXp += amount;
+    s.level.xp += amount;
+    let leveled = false;
+    while (s.level.xp >= quotaFor(s.level.lvl)) {
+      s.level.xp -= quotaFor(s.level.lvl);
+      s.level.lvl += 1;
+      leveled = true;
+    }
+
     this.touch();
+    if (leveled) this.emit('levelup');
     return true;
   }
 
@@ -190,7 +213,17 @@ class Store extends EventTarget {
       ts: Date.now(),
     });
     s.recent = s.recent.slice(0, 20);
-    this.touch();
+    if (s.balance < 10) {
+      // Банкротство: игрок всё проиграл — с 1 уровня и небольшой страховкой.
+      s.level.lvl = 1;
+      s.level.xp = 0;
+      s.level.resets += 1;
+      s.balance += 1000;
+      this.touch();
+      this.emit('bankrupt');
+    } else {
+      this.touch();
+    }
     this.emit('round');
   }
 

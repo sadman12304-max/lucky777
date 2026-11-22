@@ -18,6 +18,7 @@ const slots = simSlots(SPINS, 100);
 console.log('СЛОТЫ (5×3, 5 линий):');
 console.log(`  RTP          ${pct(slots.rtp)}`);
 console.log(`  hit rate     ${pct(slots.hitRate)}`);
+console.log(`  super game   ${pct(slots.bonusRate)}`);
 console.log(`  лучший вин   ${slots.bestWin.toFixed(0)} @ x${slots.bestMult.toFixed(1)}`);
 
 // Рулетка: EV по всем видам ставок

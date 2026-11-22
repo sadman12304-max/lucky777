@@ -45,11 +45,23 @@ try {
   const slotsBefore = await balance();
   await js(`document.getElementById('slotSpinBtn').click()`);
   await sleep(2700);
+  // редкий SUPER GAME мог открыть шторку — закрываем её выбором бонуса
+  if ((await js(`document.querySelector('.sheet h3')?.textContent || ''`)) === 'SUPER GAME') {
+    await js(`document.querySelector('.sheet-actions .btn')?.click()`);
+    await sleep(700);
+  }
   const slotsAfter = await balance();
   check('slots: раунд записан', (await rounds()) === 1);
   check('slots: ставка списана/выигрыш начислен', slotsAfter !== slotsBefore, `${slotsBefore} → ${slotsAfter}`);
   check('slots: кнопка снова активна', await js(`!document.getElementById('slotSpinBtn').disabled`));
   check('slots: символы отрисованы', (await js(`document.querySelectorAll('#slotGrid .slot-cell use').length`)) === 15);
+
+  await js(`(() => { LUCKY.games.slots._superTest(); return 'ok'; })()`);
+  await sleep(300);
+  check('slots: суперигра открывается', (await js(`document.querySelector('.sheet h3')?.textContent || ''`)) === 'SUPER GAME');
+  await js(`document.querySelector('.sheet-actions .btn')?.click()`);
+  await sleep(350);
+  check('slots: суперигра закрывается', (await js(`document.querySelectorAll('.sheet').length`)) === 0);
 
   /* ── рулетка ── */
   await go('#/roulette');
@@ -223,6 +235,30 @@ try {
   check('keno: раунд записан', (await rounds()) === kenoRoundsBefore + 1);
   check('keno: результат показан', (await js(`document.getElementById('kenoResult').textContent`)).includes('Поймано'));
   check('keno: баланс изменился', (await balance()) !== kenoBalanceBefore);
+
+  // уровни: 1000 оборота → 2 уровень
+  await js(`(() => {
+    const s = LUCKY.store;
+    s.state.balance = 20000;
+    s.state.level = { lvl: 1, xp: 0, totalXp: 0, resets: 0 };
+    s.touch();
+    s.placeBet(1000);
+  })()`);
+  const lvl = await js(`JSON.stringify(LUCKY.store.state.level)`);
+  check('уровни: 1000 оборота → 2 уровень', JSON.parse(lvl).lvl === 2 && JSON.parse(lvl).xp === 0, lvl);
+  check('уровни: карточка обновилась', (await js(`document.querySelector('[data-level] [data-level-num]')?.textContent`)) === '2');
+
+  // банкротство: баланс 0 → 1 уровень и 1000 очков
+  await js(`(() => {
+    const s = LUCKY.store;
+    s.state.balance = 0;
+    s.state.level = { lvl: 3, xp: 500, totalXp: 5000, resets: 0 };
+    s.recordRound({ game: 'test', bet: 100, win: 0 });
+  })()`);
+  const afterBankrupt = await js(`JSON.stringify({ level: LUCKY.store.state.level, balance: LUCKY.store.state.balance })`);
+  const ab = JSON.parse(afterBankrupt);
+  check('уровни: банкротство → 1 уровень', ab.level.lvl === 1 && ab.level.xp === 0, afterBankrupt);
+  check('уровни: выдан страховочный 1 000', ab.balance === 1000, afterBankrupt);
 
   /* ── консоль ── */
   const realErrors = errors.filter((e) => !/CloudStorage|favicon|postEvent|Telegram\.WebView/i.test(e));

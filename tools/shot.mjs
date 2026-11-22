@@ -42,6 +42,7 @@ const SEED = `
     st.setWelcomed();
     st.state.balance = 18450;
     st.state.stats = { rounds: 63, wins: 27, staked: 42000, won: 45750, bestWin: 12500, bestMult: 42, maxBet: 1000 };
+    st.state.level = { lvl: 9, xp: 6000, totalXp: 42000, resets: 0 };
     st.state.recent = [
       { game: 'slots', bet: 100, win: 1250, ts: Date.now() - 60000 },
       { game: 'blackjack', bet: 500, win: 1000, ts: Date.now() - 240000 },
