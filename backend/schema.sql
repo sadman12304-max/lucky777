@@ -49,3 +49,9 @@ drop policy if exists "anon select chat_players" on public.chat_players;
 drop policy if exists "anon insert chat_players" on public.chat_players;
 create policy "anon select chat_players" on public.chat_players for select to anon using (true);
 create policy "anon insert chat_players" on public.chat_players for insert to anon with check (true);
+
+-- Явные grants: работают даже если в проекте выключен
+-- «Grant API access to new tables automatically».
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.players to anon, authenticated;
+grant select, insert on public.chat_players to anon, authenticated;

@@ -12,7 +12,8 @@
 
 ## Что нужно сделать тебе
 
-1. Зарегистрироваться на https://supabase.com и создать проект (Free, регион EU).
+1. Зарегистрироваться на https://supabase.com, создать организацию (Free) и проект (регион EU).
+   В **Data access** включи все три тумблера: **Enable Data API**, **Grant API access to new tables automatically**, **Enable RLS on new tables automatically**. Мини-аппа ходит через REST, а RLS-политики уже прописаны в `backend/schema.sql`.
 2. Открыть **SQL Editor** и выполнить `backend/schema.sql`.
 3. Прислать мне:
    - **Project URL** (`https://xxxx.supabase.co`);
