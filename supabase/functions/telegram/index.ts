@@ -57,28 +57,6 @@ async function getPlayer(id: number) {
   return Array.isArray(rows) ? rows[0] || null : null;
 }
 
-async function ensurePlayer(user: any) {
-  let player = await getPlayer(user.id);
-  if (!player) {
-    await sb("players", {
-      method: "POST",
-      headers: { Prefer: "return=minimal" },
-      body: JSON.stringify({
-        telegram_id: user.id,
-        username: user.username || null,
-        first_name: user.first_name || null,
-      }),
-    });
-    player = await getPlayer(user.id);
-  } else {
-    await sb(`players?telegram_id=eq.${user.id}`, {
-      method: "PATCH",
-      headers: { Prefer: "return=minimal" },
-      body: JSON.stringify({ username: user.username || null, first_name: user.first_name || null }),
-    }).catch(() => {});
-  }
-  return player;
-}
 
 async function joinChat(chatId: number, userId: number) {
   await sb("chat_players?on_conflict=chat_id,telegram_id", {
@@ -178,6 +156,7 @@ async function onBotAdded(update: any) {
   const status = member.new_chat_member?.status;
   if (!["member", "administrator"].includes(status)) return;
   const chat = member.chat;
+  const adder = member.from ? await getPlayer(member.from.id) : null;
   await sb("chat_settings?on_conflict=chat_id", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
@@ -192,6 +171,7 @@ async function onBotAdded(update: any) {
     "/help — справка",
     "",
     "Каждому нужно один раз написать /me, чтобы попасть в топ.",
+    ...(adder ? ["", playerCard(adder)] : []),
   ].join("\n"), {
     reply_markup: {
       inline_keyboard: [[{ text: "🎰 Играть", web_app: { url: WEBAPP_URL } }]],

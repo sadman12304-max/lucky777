@@ -260,6 +260,20 @@ try {
   check('уровни: банкротство → 1 уровень', ab.level.lvl === 1 && ab.level.xp === 0, afterBankrupt);
   check('уровни: выдан страховочный 1 000', ab.balance === 1000, afterBankrupt);
 
+  // применение серверного прогресса (Supabase)
+  await js(`LUCKY.store.applyRemote({
+    balance: 777,
+    level: 4,
+    xp: 250,
+    total_xp: 9000,
+    resets: 2,
+    stats: { rounds: 99, wins: 40, staked: 1000, won: 1200, bestWin: 500, bestMult: 5, maxBet: 100 },
+    updated_at: new Date().toISOString(),
+  })`);
+  const remoteState = await js(`JSON.stringify({ balance: LUCKY.store.state.balance, level: LUCKY.store.state.level, rounds: LUCKY.store.state.stats.rounds })`);
+  const rs = JSON.parse(remoteState);
+  check('sync: серверный прогресс применяется', rs.balance === 777 && rs.level.lvl === 4 && rs.rounds === 99, remoteState);
+
   /* ── консоль ── */
   const realErrors = errors.filter((e) => !/CloudStorage|favicon|postEvent|Telegram\.WebView/i.test(e));
   check('нет JS-ошибок', realErrors.length === 0, realErrors.slice(0, 3).join(' | '));
