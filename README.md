@@ -78,6 +78,9 @@ node tools/referral.mjs
 # математика дюжин и кено
 node tools/features.mjs
 
+# клиентская синхронизация с Supabase (mock-сервер, без реального проекта)
+node tools/sync-test.mjs
+
 # скриншот любого экрана
 node tools/shot.mjs http://127.0.0.1:8765/#/slots shots/slots.png --seed
 ```
